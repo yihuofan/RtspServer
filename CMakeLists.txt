@@ -1,36 +1,29 @@
-﻿cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 project(RtspServer)
 
-# 设置 C++ 标准
+# 设置C++标准和编译选项
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-# 设置编译选项
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-
-# 设置输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-
-# 指定源文件目录
-file(GLOB SOURCE_CORE "src/*.cpp")
-file(GLOB SOURCE_LIVE "src/live/*.cpp")
-file(GLOB SOURCE_SCHEDULER "src/scheduler/*.cpp")
-set(SOURCES
-    ${SOURCE_CORE}
-    ${SOURCE_LIVE}
-    ${SOURCE_SCHEDULER}
+# 包含头文件目录
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/net
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/xop
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/3rdpart
 )
 
-# 指定头文件目录
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/include/base)
-include_directories(${PROJECT_SOURCE_DIR}/include/live)
-include_directories(${PROJECT_SOURCE_DIR}/include/scheduler)
+# 收集源码文件
+file(GLOB NET_SRCS src/net/*.cpp)
+file(GLOB XOP_SRCS src/xop/*.cpp)
 
-# 生成可执行文件
-add_executable(RtspServer ${SOURCES})
+# 生成rtsp_server和rtsp_pusher两个可执行文件
+add_executable(rtsp_server ${NET_SRCS} ${XOP_SRCS} example/rtsp_server.cpp)
+add_executable(rtsp_pusher ${NET_SRCS} ${XOP_SRCS} example/rtsp_pusher.cpp)
 
-# 链接库文件
-target_link_libraries(RtspServer 
-    pthread
-)
+# 链接系统库
+target_link_libraries(rtsp_server rt pthread dl m)
+target_link_libraries(rtsp_pusher rt pthread dl m)
+
+# 添加清理目标
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "rtsp_server;rtsp_pusher")

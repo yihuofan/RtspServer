@@ -1,6 +1,0 @@
-﻿#ifndef RTSPSERVER_VERSION_H
-#define RTSPSERVER_VERSION_H
-
-#define PROJECT_VERSION "RTSPSERVER"
-
-#endif
